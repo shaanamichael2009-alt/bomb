@@ -1,15 +1,17 @@
 import os
-import streamlit as st
+import json
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
-cred_path = os.path.join(current_dir, "firebase_creds.json")
-
 if not firebase_admin._apps:
-    cred = credentials.Certificate(cred_path)
-    firebase_admin.initialize_app(cred)
-
+    firebase_creds_json = os.environ.get("FIREBASE_CREDS_JSON")
+    if firebase_creds_json:
+        creds_dict = json.loads(firebase_creds_json)
+        cred = credentials.Certificate(creds_dict)
+        firebase_admin.initialize_app(cred)
+    else:
+        cred = credentials.Certificate("firebase_creds.json")
+        firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 
